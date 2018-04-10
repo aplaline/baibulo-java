@@ -5,11 +5,11 @@
 	version="3.0">
 
 	<servlet>
-		<servlet-name>Baibulo - data uploader</servlet-name>
-		<servlet-class>com.aplaline.baibulo.StaticContentUploader</servlet-class>
+		<servlet-name>Baibulo</servlet-name>
+		<servlet-class>com.aplaline.baibulo.StaticContentManager</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>Baibulo - data uploader</servlet-name>
+		<servlet-name>Baibulo</servlet-name>
 		<url-pattern>/assets/*</url-pattern>
 	</servlet-mapping>
 
