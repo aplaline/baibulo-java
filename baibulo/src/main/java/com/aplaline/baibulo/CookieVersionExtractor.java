@@ -13,15 +13,19 @@ public class CookieVersionExtractor implements VersionExtractor {
 
 	@Override
 	public String extractVersionFromRequest(HttpServletRequest request) {
-		final Cookie[] cookies = request.getCookies();
-		if (cookies == null) {
-			log.info("No cookies found");
-			return null;
-		}
+		return getCookieValue(request.getCookies());
+	}
+
+	private String getCookieValue(final Cookie[] cookies) {
+		final Cookie cookie = getCookieFromList(cookies);
+		return cookie == null ? null : cookie.getValue();
+	}
+
+	private Cookie getCookieFromList(final Cookie[] cookies) {
 		for (int i = 0; i < cookies.length; i++) {
 			if (cookies[i].getName().equals(VERSION_COOKIE_NAME)) {
-				log.info("Found " + VERSION_COOKIE_NAME + " with value " + cookies[i].getValue());
-				return cookies[i].getValue();
+				log.info("Found " + VERSION_COOKIE_NAME + " cookie with value " + cookies[i].getValue());
+				return cookies[i];
 			}
 		}
 		return null;

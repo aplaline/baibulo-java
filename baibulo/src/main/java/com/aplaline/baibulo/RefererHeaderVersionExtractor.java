@@ -14,17 +14,24 @@ public class RefererHeaderVersionExtractor implements VersionExtractor {
 	
 	@Override
 	public String extractVersionFromRequest(HttpServletRequest request) {
-		if (request.getHeader(REFERER_HEADER_NAME) != null) {
-			URI referer = null;
-			try {
-				referer = new URI(request.getHeader(REFERER_HEADER_NAME));
-			} catch (URISyntaxException e) {
-				log.warn("Unable to extract version from existing referrer header: " + request.getHeader(REFERER_HEADER_NAME), e);
-				return null;
-			}
+		URI referer = parseUrl(request.getHeader(REFERER_HEADER_NAME));
+		if (referer != null) {
+			log.info(referer.toString());
 			final QueryString qs = new QueryString(referer.getRawQuery());
 			return qs.get(QueryStringVersionExtractor.VERSION_PARAM_NAME);
 		}
 		return null;
+	}
+
+	private URI parseUrl(String uri) {
+		if (uri == null) {
+			return null;
+		}
+		try {
+			return new URI(uri);
+		} catch (URISyntaxException e) {
+			log.warn("Unable to extract version from existing referrer header: " + uri, e);
+			return null;
+		}
 	}
 }
