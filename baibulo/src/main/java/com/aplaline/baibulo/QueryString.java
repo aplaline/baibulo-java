@@ -3,6 +3,9 @@ package com.aplaline.baibulo;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Utility class to access query string parameters
+ */
 public final class QueryString {
 	private final Map<String,String[]> params;
 

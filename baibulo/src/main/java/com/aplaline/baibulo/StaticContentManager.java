@@ -19,11 +19,18 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Main Baibulo servlet that manages uploads and downloads 
+ */
 public class StaticContentManager extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final Logger log = LoggerFactory.getLogger(StaticContentManager.class);
 
-	private final VersionExtractor getVersionExtractor = new CompoundVersionExtractor(
+	private static final String PARAM_UPLOAD_ENABLED = "upload-enabled";
+	private static final String PARAM_ROOT = "root";
+	private static final String DEFAULT_ROOT = "/tmp";
+	
+	private static final VersionExtractor GET_VERSION_EXTRACTOR = new CompoundVersionExtractor(
 			new QueryStringVersionExtractor(),
 			new VersionHeaderVersionExtractor(),
 			new RefererHeaderVersionExtractor(),
@@ -31,7 +38,7 @@ public class StaticContentManager extends HttpServlet {
 			new ReleaseVersionExtractor()
 	);
 
-	private final VersionExtractor putVersionExtractor = new CompoundVersionExtractor(
+	private static final VersionExtractor PUT_VERSION_EXTRACTOR = new CompoundVersionExtractor(
 			new QueryStringVersionExtractor(),
 			new VersionHeaderVersionExtractor()
 	);
@@ -60,7 +67,7 @@ public class StaticContentManager extends HttpServlet {
 	}
 
 	private void retrieve(HttpServletRequest request, HttpServletResponse response) throws FileNotFoundException, IOException {
-		String version = getVersionExtractor.extractVersionFromRequest(request);
+		String version = GET_VERSION_EXTRACTOR.extractVersionFromRequest(request);
 		Path file = getFileForResourceInVersion(request, version);
 		log.info("Retrieving " + file.getParent().toString() + " in version " + version);
 
@@ -73,7 +80,7 @@ public class StaticContentManager extends HttpServlet {
 	}
 
 	private void store(HttpServletRequest request, HttpServletResponse response) throws IOException, FileNotFoundException {
-		String version = putVersionExtractor.extractVersionFromRequest(request);
+		String version = PUT_VERSION_EXTRACTOR.extractVersionFromRequest(request);
 		Path file = getFileForResourceInVersion(request, version);
 		log.info("Storing " + request.getServletPath() + request.getPathInfo() + " in " + file.toString());
 
@@ -128,13 +135,13 @@ public class StaticContentManager extends HttpServlet {
 	}
 
 	private boolean isUploadEnabled() {
-		final String result = getInitParameter("upload-enabled");
+		final String result = getInitParameter(PARAM_UPLOAD_ENABLED);
 		return result == null || result.equals("true");
 	}
 
 	private String getRoot() {
-		final String result = getInitParameter("root");
-		if (result == null) return "/tmp";
+		final String result = getInitParameter(PARAM_ROOT);
+		if (result == null) return DEFAULT_ROOT;
 		else return result;
 	}
 }

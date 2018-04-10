@@ -7,6 +7,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Version extractor retrieving information from __version cookie 
+ */
 public class CookieVersionExtractor implements VersionExtractor {
 	private static final String VERSION_COOKIE_NAME = "__version";
 	private static final Logger log = LoggerFactory.getLogger(CookieVersionExtractor.class);

@@ -5,6 +5,10 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * Version extractor that delegates in chain to other version extractors
+ * and returns the first found version 
+ */
 public class CompoundVersionExtractor implements VersionExtractor {
 	private final List<VersionExtractor> extractors;
 	
