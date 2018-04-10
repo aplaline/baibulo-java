@@ -22,10 +22,12 @@ public class CookieVersionExtractor implements VersionExtractor {
 	}
 
 	private Cookie getCookieFromList(final Cookie[] cookies) {
-		for (int i = 0; i < cookies.length; i++) {
-			if (cookies[i].getName().equals(VERSION_COOKIE_NAME)) {
-				log.info("Found " + VERSION_COOKIE_NAME + " cookie with value " + cookies[i].getValue());
-				return cookies[i];
+		if (cookies != null) {
+			for (int i = 0; i < cookies.length; i++) {
+				if (cookies[i].getName().equals(VERSION_COOKIE_NAME)) {
+					log.info("Found " + VERSION_COOKIE_NAME + " cookie with value " + cookies[i].getValue());
+					return cookies[i];
+				}
 			}
 		}
 		return null;

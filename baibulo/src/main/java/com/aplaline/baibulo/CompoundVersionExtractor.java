@@ -22,5 +22,4 @@ public class CompoundVersionExtractor implements VersionExtractor {
 		}
 		return null;
 	}
-
 }
