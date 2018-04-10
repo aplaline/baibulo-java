@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLConnection;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -62,6 +63,7 @@ public class StaticContentManager extends HttpServlet {
 		CookieVersionExtractor.setVersionCookie(resp, version);
 		Path file = FileSystems.getDefault().getPath("/tmp/", req.getServletPath(), req.getPathInfo(), version);
 		if (file.toFile().exists()) {
+			resp.setContentType(URLConnection.guessContentTypeFromName(file.getParent().toString()));
 			InputStream input = new FileInputStream(file.toFile());
 			OutputStream output = resp.getOutputStream();
 			copyStreamToStream(input, output);
