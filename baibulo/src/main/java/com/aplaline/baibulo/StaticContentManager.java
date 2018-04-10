@@ -37,64 +37,104 @@ public class StaticContentManager extends HttpServlet {
 	);
 	
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		log.info("Retrieving data using GET...");
-		retrieve(req, resp);
-		log.info("Done");
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		retrieve(request, response);
 	}
 
 	@Override
-	protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		log.info("Storing data using PUT... " + req.getPathInfo() + ", context: " + req.getContextPath() + ", servlet: " + req.getServletPath());
-		store(req, resp);
-		log.info("Done");
-	}
-
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		log.info("Storing data using POST...");
-		store(req, resp);
-		log.info("Done");
-	}
-
-	private void retrieve(HttpServletRequest req, HttpServletResponse resp) throws FileNotFoundException, IOException {
-		String version = getVersionExtractor.extractVersionFromRequest(req);
-		if (version == null) version = "release";
-		CookieVersionExtractor.setVersionCookie(resp, version);
-		Path file = FileSystems.getDefault().getPath("/tmp/", req.getServletPath(), req.getPathInfo(), version);
-		if (file.toFile().exists()) {
-			resp.setContentType(URLConnection.guessContentTypeFromName(file.getParent().toString()));
-			InputStream input = new FileInputStream(file.toFile());
-			OutputStream output = resp.getOutputStream();
-			copyStreamToStream(input, output);
+	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		if (isUploadEnabled()) {
+			store(request, response);
 		} else {
-			resp.setStatus(HttpServletResponse.SC_CREATED);
-			resp.getOutputStream().println("Resource " + req.getServletPath() + req.getPathInfo() + " not found in version " + version);
-			resp.getOutputStream().flush();
+			sendUploadDisabledMessage(response);
 		}
 	}
 
-	private void store(HttpServletRequest req, HttpServletResponse resp) throws IOException, FileNotFoundException {
-		String version = putVersionExtractor.extractVersionFromRequest(req);
-		Path folder = FileSystems.getDefault().getPath("/tmp/", req.getServletPath(), req.getPathInfo());
-		Path file = FileSystems.getDefault().getPath("/tmp/", req.getServletPath(), req.getPathInfo(), version);
-		Files.createDirectories(folder);
-		InputStream input = req.getInputStream();
-		OutputStream output = new FileOutputStream(file.toFile());
-		copyStreamToStream(input, output);
-		resp.setStatus(HttpServletResponse.SC_CREATED);
-		resp.getOutputStream().println("Resource " + req.getServletPath() + req.getPathInfo() + " created in version " + version);
-		resp.getOutputStream().flush();
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		if (isUploadEnabled()) {
+			store(request, response);
+		} else {
+			sendUploadDisabledMessage(response);
+		}
 	}
 
-	private void copyStreamToStream(InputStream input, OutputStream output) throws IOException {
-		try {
-			byte[] buffer = new byte[1024];
-			int len;
-			while ((len = input.read(buffer)) > -1) output.write(buffer, 0, len);
-			output.flush();
-		} finally {
-			output.close();
+	private void retrieve(HttpServletRequest request, HttpServletResponse response) throws FileNotFoundException, IOException {
+		String version = getVersionExtractor.extractVersionFromRequest(request);
+		Path file = getFileForResourceInVersion(request, version);
+		log.info("Retrieving " + file.getParent().toString() + " in version " + version);
+
+		if (file.toFile().exists()) {
+			CookieVersionExtractor.setVersionCookie(response, version);
+			sendResourceInVersion(response, file);
+		} else {
+			sendResourceNotFoundMessage(response, version, file);
 		}
+	}
+
+	private void store(HttpServletRequest request, HttpServletResponse response) throws IOException, FileNotFoundException {
+		String version = putVersionExtractor.extractVersionFromRequest(request);
+		Path file = getFileForResourceInVersion(request, version);
+		log.info("Storing " + request.getServletPath() + request.getPathInfo() + " in " + file.toString());
+
+		saveResourceToFile(request, file);
+		sendResourceCreatedMessage(response, file, version);
+	}
+
+	private Path getFileForResourceInVersion(HttpServletRequest request, String version) {
+		return FileSystems.getDefault().getPath(getRoot(), request.getServletPath(), request.getPathInfo(), version);
+	}
+
+	private void sendResourceInVersion(HttpServletResponse response, Path file) throws FileNotFoundException, IOException {
+		response.setContentType(URLConnection.guessContentTypeFromName(file.getParent().toString()));
+		try (InputStream input = new FileInputStream(file.toFile())) {
+			OutputStream output = response.getOutputStream();
+			copyInputStreamToOutputStream(input, output);
+		}
+	}
+
+	private void saveResourceToFile(HttpServletRequest request, Path file) throws IOException, FileNotFoundException {
+		Files.createDirectories(file.getParent());
+		InputStream input = request.getInputStream();
+		try (OutputStream output = new FileOutputStream(file.toFile())) {
+			copyInputStreamToOutputStream(input, output);
+		}
+	}
+
+	private void copyInputStreamToOutputStream(InputStream input, OutputStream output) throws IOException {
+		byte[] buffer = new byte[1024];
+		int len;
+		while ((len = input.read(buffer)) > -1) output.write(buffer, 0, len);
+		output.flush();
+	}
+
+	private void sendResourceNotFoundMessage(HttpServletResponse response, String version, Path file) throws IOException {
+		sendStatusAndMessage(response, HttpServletResponse.SC_NOT_FOUND, "Resource " + file.getParent() + " not found in version " + version);
+	}
+
+	private void sendResourceCreatedMessage(HttpServletResponse response, Path file, String version) throws IOException {
+		sendStatusAndMessage(response, HttpServletResponse.SC_CREATED, "Resource " + file.getParent().toString() + " created in version " + version);
+	}
+
+	private void sendUploadDisabledMessage(HttpServletResponse response) throws IOException {
+		sendStatusAndMessage(response, HttpServletResponse.SC_FORBIDDEN, "Upload disabled");
+	}
+
+	private void sendStatusAndMessage(HttpServletResponse response, int status, String message) throws IOException {
+		log.info(message);
+		response.setStatus(status);
+		response.getOutputStream().println(message);
+		response.getOutputStream().flush();
+	}
+
+	private boolean isUploadEnabled() {
+		final String result = getInitParameter("upload-enabled");
+		return result == null || result.equals("true");
+	}
+
+	private String getRoot() {
+		final String result = getInitParameter("root");
+		if (result == null) return "/tmp";
+		else return result;
 	}
 }

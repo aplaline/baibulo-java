@@ -7,6 +7,14 @@
 	<servlet>
 		<servlet-name>Baibulo</servlet-name>
 		<servlet-class>com.aplaline.baibulo.StaticContentManager</servlet-class>
+		<init-param>
+			<param-name>root</param-name>
+			<param-value>/tmp/baibulo</param-value>
+		</init-param>
+		<init-param>
+			<param-name>upload-enabled</param-name>
+			<param-value>true</param-value>
+		</init-param>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>Baibulo</servlet-name>
