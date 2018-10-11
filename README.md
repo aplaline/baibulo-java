@@ -87,7 +87,7 @@ In the future there will be options to store the assets in other storages, such 
 
 ## Development
 
-The project is managed using Maven. Simply import it to your favorite IDE and get hacking!
+The project is managed using Maven. Simply import it to your favorite IDE and get to hacking!
 
 ## Deployment to central
 
@@ -100,4 +100,4 @@ $ mvn release:prepare -P release
 $ mvn release:perform -P release
 ```
 
-The release profile enables GPG signing required by Sonatype's OSS repository and sets the version numbering to be `@{project.version}` instead of the default combination of `@{project.artifactId}-@{project.version}` - just because it is cleaner.
+The `release` profile enables GPG signing required by Sonatype's OSS repository and sets the version numbering to be `@{project.version}` instead of the default combination of `@{project.artifactId}-@{project.version}` - just because it is cleaner.
