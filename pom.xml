@@ -22,7 +22,7 @@
 
 	<scm>
 		<connection>scm:git:git://github.com/aplaline/baibulo-java</connection>
-		<developerConnection>scm:git:https://github.com/aplaline/baibulo-java</developerConnection>
+		<developerConnection>scm:git:git@github.com:aplaline/baibulo-java.git</developerConnection>
 		<url>https://github.com/aplaline/baibulo</url>
 	</scm>
 
