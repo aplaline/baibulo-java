@@ -19,12 +19,25 @@
 		</license>
 	</licenses>
 
+	<organization>
+		<name>Aplaline</name>
+		<url>https://www.aplaline.com</url>
+	</organization>
+
+	<developers>
+		<developer>
+			<id>padcom</id>
+			<name>Matthias Hryniszak</name>
+			<email>padcom@gmail.com</email>
+		</developer>
+	</developers>
+
 	<scm>
 		<connection>scm:git:git://github.com/aplaline/baibulo-java</connection>
 		<developerConnection>scm:git:git@github.com:aplaline/baibulo-java.git</developerConnection>
 		<url>https://github.com/aplaline/baibulo</url>
 	  <tag>HEAD</tag>
-  </scm>
+	</scm>
 
 	<issueManagement>
 		<system>GitHub</system>
