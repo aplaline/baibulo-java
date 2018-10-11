@@ -84,3 +84,20 @@ Baibulo stores the content of static assets in folders with the name of the file
 ```
 
 In the future there will be options to store the assets in other storages, such as SQL and NoSQL databases, maybe even in S3 or other cloud storages.
+
+## Development
+
+The project is managed using Maven. Simply import it to your favorite IDE and get hacking!
+
+## Deployment to central
+
+To deploy to central you need to have the proper Maven setup. You can read more about it on https://central.sonatype.org/pages/apache-maven.html.
+
+Command for running the release:
+
+```
+$ mvn release:prepare -P release
+$ mvn release:perform -P release
+```
+
+The release profile enables GPG signing required by Sonatype's OSS repository and sets the version numbering to be `@{project.version}` instead of the default combination of `@{project.artifactId}-@{project.version}` - just because it is cleaner.
