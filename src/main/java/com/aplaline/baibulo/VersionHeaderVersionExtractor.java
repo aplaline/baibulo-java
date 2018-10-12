@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletRequest;
  * Version extractor retrieving version information from "Version" header
  */
 public class VersionHeaderVersionExtractor implements VersionExtractor {
-	private static final String VERSION_HEADER_NAME = "Version";
+	public static final String VERSION_HEADER_NAME = "Version";
 	
 	@Override
 	public String extractVersionFromRequest(HttpServletRequest request) {
