@@ -40,7 +40,8 @@ public class StaticContentManager extends HttpServlet {
 
 	private static final VersionExtractor PUT_VERSION_EXTRACTOR = new CompoundVersionExtractor(
 			new QueryStringVersionExtractor(),
-			new VersionHeaderVersionExtractor()
+			new VersionHeaderVersionExtractor(),
+			new ErrorVersionExtractor()
 	);
 	
 	@Override
