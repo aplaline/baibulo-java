@@ -62,6 +62,15 @@ curl -v -X PUT \
   http://localhost:8080/hello/assets/image.png?version=TST-1234
 ```
 
+## Specifying version when uploading assets
+
+When uploading assets Baibulo has a 2 step process that tries to figure out what version should the asset be in:
+
+1. Query string parameter named `version`
+2. Header `Version`
+
+If none is specified the upload fails.
+
 ## Retrieval rules
 
 When retrieving content Baibulo has 4 stages at which it tries to determine the version which should be served:
